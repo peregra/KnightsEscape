@@ -52,9 +52,6 @@ Plugins/*/Binaries/*
 # Builds
 Build/*
 
-# Content - temporary ignore
-Content/Textures/t_ston*
-
 # Whitelist PakBlacklist-<BuildConfiguration>.txt files
 !Build/*/
 Build/*/**
