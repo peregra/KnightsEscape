@@ -53,7 +53,7 @@ Plugins/*/Binaries/*
 Build/*
 
 # Content - temporary ignore
-Content/Textures/*
+Content/Textures/t_ston*
 
 # Whitelist PakBlacklist-<BuildConfiguration>.txt files
 !Build/*/
