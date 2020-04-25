@@ -111,7 +111,6 @@ void AMainCharacter::BeginPlay()
 			MainPlayerController->GameModeOnly();
 		}
 	}
-
 }
 
 // Called every frame
@@ -339,13 +338,19 @@ void AMainCharacter::MoveRight(float MoveRate)
 
 void AMainCharacter::Turn(float MoveRate)
 {
-	AddControllerYawInput(MoveRate);
+	if (CanMove(MoveRate))
+	{
+		AddControllerYawInput(MoveRate);
+	}
 }
 
 
 void AMainCharacter::LookUp(float MoveRate)
 {
-	AddControllerPitchInput(MoveRate);
+	if (CanMove(MoveRate))
+	{
+		AddControllerPitchInput(MoveRate);
+	}
 }
 
 
@@ -400,6 +405,14 @@ void AMainCharacter::AttackPrimaryButtonDown()
 {
 	bAttackPrimaryButtonDown = true;
 
+	if (MainPlayerController)
+	{
+		if (MainPlayerController->bPauseMenuVisible)
+		{
+			return;
+		}
+	}
+
 	if (EquippedWeapon)
 	{
 		Attack();
@@ -417,6 +430,14 @@ void AMainCharacter::AttackPrimaryButtonUp()
 void AMainCharacter::AttackSecondaryButtonDown()
 {
 	bAttackSecondaryButtonDown = true;
+
+	if (MainPlayerController)
+	{
+		if (MainPlayerController->bPauseMenuVisible)
+		{
+			return;
+		}
+	}
 
 	if (EquippedWeapon)
 	{
@@ -739,6 +760,9 @@ void AMainCharacter::SaveGame()
 	SaveGameInstance->CharacterStats.MaxStamina = MaxStamina;
 	SaveGameInstance->CharacterStats.Coins = Coins;
 
+	SaveGameInstance->CharacterStats.Location = GetActorLocation();
+	SaveGameInstance->CharacterStats.Rotation = GetActorRotation();
+
 	FString MapName = GetWorld()->GetMapName();
 	MapName.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
 
@@ -748,10 +772,6 @@ void AMainCharacter::SaveGame()
 	{
 		SaveGameInstance->CharacterStats.WeaponName = EquippedWeapon->Name;
 	}
-
-
-	SaveGameInstance->CharacterStats.Location = GetActorLocation();
-	SaveGameInstance->CharacterStats.Rotation = GetActorRotation();
 
 	UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveGameInstance->SaveName, SaveGameInstance->UserIndex);
 }
@@ -768,7 +788,7 @@ void AMainCharacter::LoadGame(bool bSetPosition)
 	Stamina = LoadGameInstance->CharacterStats.Stamina;
 	MaxStamina = LoadGameInstance->CharacterStats.MaxStamina;
 	Coins = LoadGameInstance->CharacterStats.Coins;
-
+/*
 	if (WeaponStorage)
 	{
 		AItemStorage* Weapons = GetWorld()->SpawnActor<AItemStorage>(WeaponStorage);
@@ -781,24 +801,31 @@ void AMainCharacter::LoadGame(bool bSetPosition)
 				AWeapon* WeaponToEquip = GetWorld()->SpawnActor<AWeapon>(Weapons->WeaponMap[WeaponName]);
 
 				WeaponToEquip->Equip(this);
+				UE_LOG(LogTemp, Warning, TEXT("Weapon Loaded"))
 			}
 		}
 	}
-	
+	*/
 	if (bSetPosition)
 	{
 		SetActorLocation(LoadGameInstance->CharacterStats.Location);
 		SetActorRotation(LoadGameInstance->CharacterStats.Rotation);
+		UE_LOG(LogTemp, Warning, TEXT("Position Loaded"))
 	}
 
 	SetMovementState(EMovementState::EMS_Normal);
 	GetMesh()->bPauseAnims = false;
 	GetMesh()->bNoSkeletonUpdate = false;
 
-	if (LoadGameInstance->CharacterStats.LevelName != TEXT(""))
+	if (LoadGameInstance->CharacterStats.LevelName != TEXT("") && LoadGameInstance->CharacterStats.LevelName != TEXT("Dungeon"))
 	{
 		FName LevelName(*LoadGameInstance->CharacterStats.LevelName);
 		SwitchLevel(LevelName);
+	}
+
+	if (MainPlayerController)
+	{
+		MainPlayerController->GameModeOnly();
 	}
 }
 
@@ -837,6 +864,9 @@ void AMainCharacter::LoadGameNoSwitch()
 	SetMovementState(EMovementState::EMS_Normal);
 	GetMesh()->bPauseAnims = false;
 	GetMesh()->bNoSkeletonUpdate = false;
+
+	if (MainPlayerController)
+	{
+		MainPlayerController->GameModeOnly();
+	}
 }
-
-
