@@ -801,7 +801,6 @@ void AMainCharacter::LoadGame(bool bSetPosition)
 				AWeapon* WeaponToEquip = GetWorld()->SpawnActor<AWeapon>(Weapons->WeaponMap[WeaponName]);
 
 				WeaponToEquip->Equip(this);
-				UE_LOG(LogTemp, Warning, TEXT("Weapon Loaded"))
 			}
 		}
 	}
@@ -810,7 +809,6 @@ void AMainCharacter::LoadGame(bool bSetPosition)
 	{
 		SetActorLocation(LoadGameInstance->CharacterStats.Location);
 		SetActorRotation(LoadGameInstance->CharacterStats.Rotation);
-		UE_LOG(LogTemp, Warning, TEXT("Position Loaded"))
 	}
 
 	SetMovementState(EMovementState::EMS_Normal);
