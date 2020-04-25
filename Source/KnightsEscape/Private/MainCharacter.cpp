@@ -788,7 +788,7 @@ void AMainCharacter::LoadGame(bool bSetPosition)
 	Stamina = LoadGameInstance->CharacterStats.Stamina;
 	MaxStamina = LoadGameInstance->CharacterStats.MaxStamina;
 	Coins = LoadGameInstance->CharacterStats.Coins;
-/*
+
 	if (WeaponStorage)
 	{
 		AItemStorage* Weapons = GetWorld()->SpawnActor<AItemStorage>(WeaponStorage);
@@ -805,7 +805,7 @@ void AMainCharacter::LoadGame(bool bSetPosition)
 			}
 		}
 	}
-	*/
+
 	if (bSetPosition)
 	{
 		SetActorLocation(LoadGameInstance->CharacterStats.Location);
@@ -864,6 +864,12 @@ void AMainCharacter::LoadGameNoSwitch()
 	SetMovementState(EMovementState::EMS_Normal);
 	GetMesh()->bPauseAnims = false;
 	GetMesh()->bNoSkeletonUpdate = false;
+
+	if (LoadGameInstance->CharacterStats.LevelName != TEXT("") && LoadGameInstance->CharacterStats.LevelName != TEXT("Dungeon"))
+	{
+		FName LevelName(*LoadGameInstance->CharacterStats.LevelName);
+		SwitchLevel(LevelName);
+	}
 
 	if (MainPlayerController)
 	{
